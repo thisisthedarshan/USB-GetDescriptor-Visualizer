@@ -1,0 +1,61 @@
+#
+#	List of USB ID's
+#
+#	Maintained by Stephen J. Gowdy <linux.usb.ids@gmail.com>
+#	If you have any new entries, please submit them via
+#		http://www.linux-usb.org/usb-ids.html
+#	or send entries as patches (diff -u old new) in the
+#	body of your email (a bot will attempt to deal with it).
+#	The latest version can be obtained from
+#		http://www.linux-usb.org/usb.ids
+#
+# Version: 2025.04.01
+# Date:    2025-04-01 20:34:02
+# Released under GNU GENERAL PUBLIC LICENSE
+
+
+# List of Physical Descriptor Item Types
+
+# Syntax:
+# PHY item_type  item_type_name
+
+PHY 00  None
+PHY 01  Hand
+PHY 02  Eyeball
+PHY 03  Eyebrow
+PHY 04  Eyelid
+PHY 05  Ear
+PHY 06  Nose
+PHY 07  Mouth
+PHY 08  Upper Lip
+PHY 09  Lower Lip
+PHY 0a  Jaw
+PHY 0b  Neck
+PHY 0c  Upper Arm
+PHY 0d  Elbow
+PHY 0e  Forearm
+PHY 0f  Wrist
+PHY 10  Palm
+PHY 11  Thumb
+PHY 12  Index Finger
+PHY 13  Middle Finger
+PHY 14  Ring Finger
+PHY 15  Little Finger
+PHY 16  Head
+PHY 17  Shoulder
+PHY 18  Hip
+PHY 19  Waist
+PHY 1a  Thigh
+PHY 1b  Knee
+PHY 1c  calf
+PHY 1d  Ankle
+PHY 1e  Foot
+PHY 1f  Heel
+PHY 20  Ball of Foot
+PHY 21  Big Toe
+PHY 22  Second Toe
+PHY 23  Third Toe
+PHY 24  Fourth Toe
+PHY 25  Fifth Toe
+PHY 26  Brow
+PHY 27  Cheek

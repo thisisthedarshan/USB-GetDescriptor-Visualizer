@@ -1,0 +1,24 @@
+#
+#	List of USB ID's
+#
+#	Maintained by Stephen J. Gowdy <linux.usb.ids@gmail.com>
+#	If you have any new entries, please submit them via
+#		http://www.linux-usb.org/usb-ids.html
+#	or send entries as patches (diff -u old new) in the
+#	body of your email (a bot will attempt to deal with it).
+#	The latest version can be obtained from
+#		http://www.linux-usb.org/usb.ids
+#
+# Version: 2025.04.01
+# Date:    2025-04-01 20:34:02
+# Released under GNU GENERAL PUBLIC LICENSE
+
+
+# List of HID Descriptor Types
+
+# Syntax:
+# HID descriptor_type  descriptor_type_name
+
+HID 21  HID
+HID 22  Report
+HID 23  Physical

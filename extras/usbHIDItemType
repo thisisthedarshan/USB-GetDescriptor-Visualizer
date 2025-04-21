@@ -1,0 +1,48 @@
+#
+#	List of USB ID's
+#
+#	Maintained by Stephen J. Gowdy <linux.usb.ids@gmail.com>
+#	If you have any new entries, please submit them via
+#		http://www.linux-usb.org/usb-ids.html
+#	or send entries as patches (diff -u old new) in the
+#	body of your email (a bot will attempt to deal with it).
+#	The latest version can be obtained from
+#		http://www.linux-usb.org/usb.ids
+#
+# Version: 2025.04.01
+# Date:    2025-04-01 20:34:02
+# Released under GNU GENERAL PUBLIC LICENSE
+
+# List of HID Descriptor Item Types
+# Note: 2 bits LSB encode data length following
+
+# Syntax:
+# R item_type  item_type_name
+
+R 04 Usage Page
+R 08 Usage
+R 14 Logical Minimum
+R 18 Usage Minimum
+R 24 Logical Maximum
+R 28 Usage Maximum
+R 34 Physical Minimum
+R 38 Designator Index
+R 44 Physical Maximum
+R 48 Designator Minimum
+R 54 Unit Exponent
+R 58 Designator Maximum
+R 64 Unit
+R 74 Report Size
+R 78 String Index
+R 80 Input
+R 84 Report ID
+R 88 String Minimum
+R 90 Output
+R 94 Report Count
+R 98 String Maximum
+R a0 Collection
+R a4 Push
+R a8 Delimiter
+R b0 Feature
+R b4 Pop
+R c0 End Collection

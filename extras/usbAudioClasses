@@ -1,0 +1,77 @@
+#
+#	List of USB ID's
+#
+#	Maintained by Stephen J. Gowdy <linux.usb.ids@gmail.com>
+#	If you have any new entries, please submit them via
+#		http://www.linux-usb.org/usb-ids.html
+#	or send entries as patches (diff -u old new) in the
+#	body of your email (a bot will attempt to deal with it).
+#	The latest version can be obtained from
+#		http://www.linux-usb.org/usb.ids
+#
+# Version: 2025.04.01
+# Date:    2025-04-01 20:34:02
+# Released under GNU GENERAL PUBLIC LICENSE
+
+
+# List of Audio Class Terminal Types
+
+# Syntax:
+# AT terminal_type  terminal_type_name
+
+AT 0100  USB Undefined
+AT 0101  USB Streaming
+AT 01ff  USB Vendor Specific
+AT 0200  Input Undefined
+AT 0201  Microphone
+AT 0202  Desktop Microphone
+AT 0203  Personal Microphone
+AT 0204  Omni-directional Microphone
+AT 0205  Microphone Array
+AT 0206  Processing Microphone Array
+AT 0300  Output Undefined
+AT 0301  Speaker
+AT 0302  Headphones
+AT 0303  Head Mounted Display Audio
+AT 0304  Desktop Speaker
+AT 0305  Room Speaker
+AT 0306  Communication Speaker
+AT 0307  Low Frequency Effects Speaker
+AT 0400  Bidirectional Undefined
+AT 0401  Handset
+AT 0402  Headset
+AT 0403  Speakerphone, no echo reduction
+AT 0404  Echo-suppressing speakerphone
+AT 0405  Echo-canceling speakerphone
+AT 0500  Telephony Undefined
+AT 0501  Phone line
+AT 0502  Telephone
+AT 0503  Down Line Phone
+AT 0600  External Undefined
+AT 0601  Analog Connector
+AT 0602  Digital Audio Interface
+AT 0603  Line Connector
+AT 0604  Legacy Audio Connector
+AT 0605  SPDIF interface
+AT 0606  1394 DA stream
+AT 0607  1394 DV stream soundtrack
+AT 0700  Embedded Undefined
+AT 0701  Level Calibration Noise Source
+AT 0702  Equalization Noise
+AT 0703  CD Player
+AT 0704  DAT
+AT 0705  DCC
+AT 0706  MiniDisc
+AT 0707  Analog Tape
+AT 0708  Phonograph
+AT 0709  VCR Audio
+AT 070a  Video Disc Audio
+AT 070b  DVD Audio
+AT 070c  TV Tuner Audio
+AT 070d  Satellite Receiver Audio
+AT 070e  Cable Tuner Audio
+AT 070f  DSS Audio
+AT 0710  Radio Receiver
+AT 0711  Radio Transmitter
+AT 0712  Multitrack Recorder
+AT 0713  Synthesizer
