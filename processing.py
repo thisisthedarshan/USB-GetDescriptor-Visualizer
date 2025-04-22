@@ -283,6 +283,50 @@ def CreateAudioInterfaceDescriptorNode(descriptor: list, interface_subclass: int
 <TR><TD>iChannelNames: {iChannelNames}</TD></TR>
 <TR><TD>iTerminal: {iTerminal}</TD></TR>
 </TABLE>>'''
+        elif bDescriptorSubtype == 0x03:  # OUTPUT_TERMINAL
+            bTerminalID = descriptor[3]
+            wTerminalType = (descriptor[5] << 8) + descriptor[4]
+            terminal_type_name = More["Audio"].get(wTerminalType, "Unknown")
+            bAssocTerminal = descriptor[6]
+            bSourceID = descriptor[7]
+            iTerminal = descriptor[8]
+            return f'''<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+<TR><TD BGCOLOR="lightgrey"><B>Output Terminal Descriptor</B></TD></TR>
+<TR><TD>bLength: {bLength}</TD></TR>
+<TR><TD>bDescriptorType: {bDescriptorType}</TD></TR>
+<TR><TD>bDescriptorSubtype: {bDescriptorSubtype} (OUTPUT_TERMINAL)</TD></TR>
+<TR><TD>bTerminalID: {bTerminalID}</TD></TR>
+<TR><TD>wTerminalType: {wTerminalType} ({terminal_type_name})</TD></TR>
+<TR><TD>bAssocTerminal: {bAssocTerminal}</TD></TR>
+<TR><TD>bSourceID: {bSourceID}</TD></TR>
+<TR><TD>iTerminal: {iTerminal}</TD></TR>
+</TABLE>>'''
+        elif bDescriptorSubtype == 0x06:  # FEATURE_UNIT
+            bUnitID = descriptor[3]
+            bSourceID = descriptor[4]
+            bControlSize = descriptor[5]
+            n = (bLength - 7) // bControlSize  # Number of bmaControls entries
+            bmaControls = []
+            offset = 6
+            for i in range(n):
+                control = 0
+                for j in range(bControlSize):
+                    control += descriptor[offset + j] << (8 * j)
+                bmaControls.append(control)
+                offset += bControlSize
+            iFeature = descriptor[offset]
+            bmaControls_str = ", ".join(hex(ctrl) for ctrl in bmaControls)
+            return f'''<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+<TR><TD BGCOLOR="lightgrey"><B>Feature Unit Descriptor</B></TD></TR>
+<TR><TD>bLength: {bLength}</TD></TR>
+<TR><TD>bDescriptorType: {bDescriptorType}</TD></TR>
+<TR><TD>bDescriptorSubtype: {bDescriptorSubtype} (FEATURE_UNIT)</TD></TR>
+<TR><TD>bUnitID: {bUnitID}</TD></TR>
+<TR><TD>bSourceID: {bSourceID}</TD></TR>
+<TR><TD>bControlSize: {bControlSize}</TD></TR>
+<TR><TD>bmaControls: [{bmaControls_str}]</TD></TR>
+<TR><TD>iFeature: {iFeature}</TD></TR>
+</TABLE>>'''
         else:
             return f"Unknown AudioControl Subtype: {hex(bDescriptorSubtype)}"
     elif interface_subclass == 0x02:  # AudioStreaming
