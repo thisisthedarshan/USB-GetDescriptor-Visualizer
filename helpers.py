@@ -4,7 +4,7 @@
 # For a copy, see <https://opensource.org/licenses/MIT>.
 
 from extras.db import db
-from extras.classes import DeviceCapabilityTypeCode
+from extras.classes import CountryCodes, DeviceCapabilityTypeCode
 
 def bcd_to_string(bcd_value: int) -> str:
     """
@@ -46,3 +46,13 @@ def get_bos_device_capability(hexNum:int) -> str:
     return DeviceCapabilityTypeCode[hexNum]
   else:
     return "Reserved"
+
+
+def decode_country_code(code):
+    if isinstance(code, str):
+        code = int(code, 0)
+    name = CountryCodes.get(code)
+    if name is not None:
+        return name
+    else:
+        return f"Unknown (0x{code:02X})"
