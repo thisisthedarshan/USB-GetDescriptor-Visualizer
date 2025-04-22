@@ -1,3 +1,8 @@
+# Copyright (c) 2025 Darshan P. All rights reserved.
+
+# This work is licensed under the terms of the MIT license.  
+# For a copy, see <https://opensource.org/licenses/MIT>.
+
 from graphviz import Digraph
 from extras.classes import Classes, More
 from helpers import bcd_to_string, get_vendor_name, get_product_name, get_bos_device_capability
