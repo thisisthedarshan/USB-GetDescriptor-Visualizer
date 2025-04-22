@@ -23,3 +23,15 @@ You can also pass `--render`, `--save` so as to skip the menu option asking you 
 
 1. Standard USB Descriptors
 2. Audio Class USB Descriptors
+
+---
+
+Simple way to check what your system's device descriptors are:
+> Pre-requisites: libusb-1.0 (sudo apt install libusb-1.0-0-dev)
+
+1. Build the [`dumpDescriptor.c`](dumpDescriptor.c) file using `gcc dumpDescriptor.c -o dumpDescriptor -lusb-1.0`
+2. Run the generated `dumpDescriptor` with **sudo** permissions.
+3. Simply run `cat usb_descriptors_dump.txt | python3 main.py --render` to see the output
+
+> [!NOTE]
+> Check out the info [USB-GET_DESCRIPTORS](GET_DESCRIPTOR.md) to learn more
