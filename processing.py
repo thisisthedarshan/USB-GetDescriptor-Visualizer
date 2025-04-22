@@ -736,6 +736,98 @@ def CreateHIDDescriptorNode(descriptor: list) -> str:
     table_str += '</TABLE>>'
     return table_str
 
+
+def CreateReportDescriptorNode(descriptor: list) -> str:
+    '''**Report Descriptor (0x22)**: Describes the format of data exchanged with a HID device.'''
+    def decode_item(data: list, index: int) -> (str, int):
+        if index >= len(data):
+            return "", index
+        b = data[index]
+        item_size = (b & 0x03) if (b & 0x03) < 3 else 4  # 0:0 bytes, 1:1 byte, 2:2 bytes, 3:4 bytes
+        item_type = (b & 0x0C) >> 2  # 0:Main, 1:Global, 2:Local, 3:Reserved
+        item_tag = (b & 0xF0) >> 4
+        item_data = 0
+        for i in range(item_size):
+            if index + 1 + i >= len(data):
+                break
+            item_data |= data[index + 1 + i] << (8 * i)
+        item_name = More["hid-item"].get(b, f"Unknown Tag 0x{b:02x}")
+        if item_type == 0:  # Main Items
+            if b == 0x80:  # Input
+                flags = [ "Constant" if item_data & 0x01 else "Data",
+                          "Variable" if item_data & 0x02 else "Array",
+                          "Relative" if item_data & 0x04 else "Absolute",
+                          "Wrap" if item_data & 0x08 else "No Wrap",
+                          "Non Linear" if item_data & 0x10 else "Linear",
+                          "No Preferred" if item_data & 0x20 else "Preferred State",
+                          "Null State" if item_data & 0x40 else "No Null",
+                          "Volatile" if item_data & 0x80 else "Non Volatile",
+                          "Buffered Bytes" if item_data & 0x100 else "Bit Field"]
+                item_str = f"Input ({', '.join(f for f in flags if 'No ' not in f)})"
+            elif b == 0x90:  # Output
+                flags = [ "Constant" if item_data & 0x01 else "Data",
+                          "Variable" if item_data & 0x02 else "Array",
+                          "Relative" if item_data & 0x04 else "Absolute",
+                          "Wrap" if item_data & 0x08 else "No Wrap",
+                          "Non Linear" if item_data & 0x10 else "Linear",
+                          "No Preferred" if item_data & 0x20 else "Preferred State",
+                          "Null State" if item_data & 0x40 else "No Null",
+                          "Volatile" if item_data & 0x80 else "Non Volatile",
+                          "Buffered Bytes" if item_data & 0x100 else "Bit Field"]
+                item_str = f"Output ({', '.join(f for f in flags if 'No ' not in f)})"
+            elif b == 0xb0:  # Feature
+                flags = [ "Constant" if item_data & 0x01 else "Data",
+                          "Variable" if item_data & 0x02 else "Array",
+                          "Relative" if item_data & 0x04 else "Absolute",
+                          "Wrap" if item_data & 0x08 else "No Wrap",
+                          "Non Linear" if item_data & 0x10 else "Linear",
+                          "No Preferred" if item_data & 0x20 else "Preferred State",
+                          "Null State" if item_data & 0x40 else "No Null",
+                          "Volatile" if item_data & 0x80 else "Non Volatile",
+                          "Buffered Bytes" if item_data & 0x100 else "Bit Field"]
+                item_str = f"Feature ({', '.join(f for f in flags if 'No ' not in f)})"
+            elif b == 0xa0:  # Collection
+                collection_types = {0: "Physical", 1: "Application", 2: "Logical", 3: "Report",
+                                  4: "Named Array", 5: "Usage Switch", 6: "Usage Modifier"}
+                item_str = f"Collection ({collection_types.get(item_data, 'Vendor Defined')})"
+            elif b == 0xc0:  # End Collection
+                item_str = "End Collection"
+            else:
+                item_str = f"{item_name}: 0x{item_data:x}"
+        else:
+            item_str = f"{item_name}: 0x{item_data:x}"
+        return item_str, index + 1 + item_size
+
+    items = []
+    index = 0
+    while index < len(descriptor):
+        item_str, new_index = decode_item(descriptor, index)
+        if not item_str:
+            break
+        items.append(item_str)
+        index = new_index
+
+    table_str = f'''<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+<TR><TD BGCOLOR="lightgrey"><B>Report Descriptor</B></TD></TR>
+<TR><TD>Length: {len(descriptor)}</TD></TR>'''
+    for i, item in enumerate(items):
+        table_str += f'<TR><TD>Item {i}: {item}</TD></TR>'
+    table_str += '</TABLE>>'
+    return table_str
+
+def CreatePhysicalDescriptorNode(descriptor: list) -> str:
+    '''**Physical Descriptor (0x23)**: Describes physical characteristics of a HID device (e.g., for force feedback).'''
+    bLength = descriptor[0]
+    bDescriptorType = descriptor[1]
+    bData = [hex(b) for b in descriptor[2:bLength]]  # Raw data as hex
+    return f'''<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+<TR><TD BGCOLOR="lightgrey"><B>Physical Descriptor</B></TD></TR>
+<TR><TD>bLength: {bLength}</TD></TR>
+<TR><TD>bDescriptorType: {bDescriptorType} (Physical)</TD></TR>
+<TR><TD>Data: {bData}</TD></TR>
+</TABLE>>'''
+
+
 def CreateAudioInterfaceDescriptorNode(descriptor: list, interface_subclass: int) -> str:
     """Create a graph node for audio class-specific interface descriptors (bDescriptorType=0x24)."""
     bLength = descriptor[0]
@@ -944,6 +1036,10 @@ def ProcessAndGenerateFlow(descriptors: list) -> Digraph:
             table_str = CreateDeviceCapabilityDescriptorNode(descriptor)
         elif bDescriptorType == 0x21:  # HID Descriptor
             table_str = CreateHIDDescriptorNode(descriptor)
+        elif bDescriptorType == 0x22:  # Report Descriptor
+            table_str = CreateReportDescriptorNode(descriptor)
+        elif bDescriptorType == 0x23:  # Physical Descriptor
+            table_str = CreatePhysicalDescriptorNode(descriptor)
         elif bDescriptorType == 0x24:  # Class-Specific Interface Descriptor (Audio)
             table_str = CreateAudioInterfaceDescriptorNode(descriptor, current_interface_subclass)
         elif bDescriptorType == 0x25:  # Class-Specific Endpoint Descriptor (Audio)
