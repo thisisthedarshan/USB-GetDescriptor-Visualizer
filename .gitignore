@@ -173,6 +173,12 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 
+# VS Code Folder, VIM/NVIM generated files, Temporary Files
+.vscode/
+*.swp
+*.tmp
+
 # Generated files
 usb_descriptors
 usb_descriptors.png
+usb_descriptors_dump.txt
