@@ -255,7 +255,7 @@ Classes = {
 }
 
 More = {
-  ["Audio"] : {
+  "Audio" : {
     0x0100 :  "USB Undefined",
     0x0101 :  "USB Streaming",
     0x01ff :  "USB Vendor Specific",
@@ -313,12 +313,12 @@ More = {
     0x0712 :  "Multitrack Recorder",
     0x0713 :  "Synthesizer"
   },
-  ["hid"] : {
+  "hid" : {
     0x21 :  "HID",
     0x22 :  "Report",
     0x23 :  "Physical"
   },
-  ["hid-item"] : {
+  "hid-item" : {
     0x04 : "Usage Page",
     0x08 : "Usage",
     0x14 : "Logical Minimum",
@@ -347,12 +347,11 @@ More = {
     0xb4 : "Pop",
     0xc0 : "End Collection"
   },
-  ["hid"] : {
+  "hid" : {
     0x21 :  "HID",
     0x22 :  "Report",
     0x23 :  "Physical"
   },
-
 }
 
 DeviceCapabilityTypeCode = {
