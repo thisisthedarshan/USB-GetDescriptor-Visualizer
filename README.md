@@ -16,3 +16,8 @@ Once the program starts, it asks you to enter the result of **GET_DESCRIPTOR** U
 
 > [!NOTE]
 > The program assumes the byte order to be in Little Endian format.
+
+## Supported Descriptors
+
+1. Standard USB Descriptors
+2. Audio Class USB Descriptors
