@@ -17,6 +17,8 @@ Once the program starts, it asks you to enter the result of **GET_DESCRIPTOR** U
 > [!NOTE]
 > The program assumes the byte order to be in Little Endian format.
 
+You can also pass `--render`, `--save` so as to skip the menu option asking you whether you want to save file or render it.
+
 ## Supported Descriptors
 
 1. Standard USB Descriptors
