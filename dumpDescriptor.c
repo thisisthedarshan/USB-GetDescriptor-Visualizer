@@ -10,6 +10,7 @@
 
 #define MAX_DEVICES 128
 #define MAX_DESCRIPTOR_SIZE 4096
+#define MAX_INTERFACES 8
 #define DUMP_FILE "usb_descriptors_dump.txt"
 
 // Descriptor types
@@ -58,6 +59,7 @@ int main() {
     libusb_device_handle *handle = NULL;
     struct libusb_device_descriptor desc;
     unsigned char buffer[MAX_DESCRIPTOR_SIZE];
+    unsigned char string_data[256];
 
     r = libusb_init(&ctx);
     if (r < 0) {
@@ -83,8 +85,25 @@ int main() {
             continue;
         }
 
-        printf("[%d] VID: %04x PID: %04x\n", index, desc.idVendor,
-               desc.idProduct);
+        // Get product name if possible
+        libusb_device_handle *temp_handle;
+        r = libusb_open(devs[i], &temp_handle);
+
+        printf("[%d] VID: %04x PID: %04x", index, desc.idVendor, desc.idProduct);
+
+        if (r == 0 && temp_handle) {
+            if (desc.iProduct > 0) {
+                memset(string_data, 0, sizeof(string_data));
+                if (libusb_get_string_descriptor_ascii(
+                        temp_handle, desc.iProduct, string_data,
+                        sizeof(string_data)) > 0) {
+                    printf(" - %s", string_data);
+                }
+            }
+            libusb_close(temp_handle);
+        }
+        printf("\n");
+
         device_indices[index++] = i;
     }
 
@@ -125,17 +144,33 @@ int main() {
         return 1;
     }
 
-    // Claim the first interface to ensure we can access all descriptors
-    int current_config;
-    r = libusb_get_configuration(handle, &current_config);
-    if (r == 0) {
-        // Attempt to detach kernel driver if one is active
-        for (int i = 0; i < 1; i++) {
-            if (libusb_kernel_driver_active(handle, i)) {
-                libusb_detach_kernel_driver(handle, i);
-            }
-            libusb_claim_interface(handle, i);
+    // Array to track which interfaces had kernel drivers attached
+    int kernel_driver_active[MAX_INTERFACES] = {0};
+    int num_interfaces = 0;
+
+    // Get number of interfaces from configuration
+    r = libusb_get_device_descriptor(selected_dev, &desc);
+    if (r == 0 && desc.bNumConfigurations > 0) {
+        struct libusb_config_descriptor *config;
+        r = libusb_get_config_descriptor(selected_dev, 0, &config);
+        if (r == 0) {
+            num_interfaces = config->bNumInterfaces;
+            libusb_free_config_descriptor(config);
         }
+    }
+
+    // Limit to MAX_INTERFACES
+    if (num_interfaces > MAX_INTERFACES) num_interfaces = MAX_INTERFACES;
+    if (num_interfaces == 0)
+        num_interfaces = 1;  // Assume at least one interface
+
+    // Claim interfaces and remember which had kernel drivers
+    for (int i = 0; i < num_interfaces; i++) {
+        kernel_driver_active[i] = libusb_kernel_driver_active(handle, i);
+        if (kernel_driver_active[i]) {
+            libusb_detach_kernel_driver(handle, i);
+        }
+        libusb_claim_interface(handle, i);
     }
 
     // Get device descriptor
@@ -204,9 +239,13 @@ int main() {
         }
     }
 
-    // Release interfaces
-    for (int i = 0; i < 1; i++) {
+    // Release all claimed interfaces
+    for (int i = 0; i < num_interfaces; i++) {
         libusb_release_interface(handle, i);
+        // Reattach kernel driver if it was active before
+        if (kernel_driver_active[i]) {
+            libusb_attach_kernel_driver(handle, i);
+        }
     }
 
     fclose(out);
