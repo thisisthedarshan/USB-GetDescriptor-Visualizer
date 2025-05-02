@@ -997,7 +997,7 @@ def CreateAudioEndpointDescriptorNode(descriptor: list) -> str:
 
 # Exposed APIs
 def LoadHexArray(input_string):
-    return [int(word, 16) for word in input_string.split() if word.startswith('0x')]
+    return [int(word, 16) for word in input_string.split()]
 
 def ProcessAndGenerateFlow(descriptors: list) -> Digraph:
     dot = Digraph()  # Prepare an instance

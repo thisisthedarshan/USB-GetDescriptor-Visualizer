@@ -14,7 +14,7 @@ def main():
     args = parser.parse_args()
     
     # Get descriptors
-    input_data = input("Enter Descriptor Bytes separated by spaces: ")
+    input_data = input("Enter HEX Descriptor Bytes separated by spaces: ")
     descriptors = LoadHexArray(input_data)
 
     dot = Digraph()  # Prepare an instance
