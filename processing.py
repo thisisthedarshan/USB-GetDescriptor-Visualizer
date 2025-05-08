@@ -30,7 +30,7 @@ def CreateDeviceDescriptorNode(descriptor: list):
     return f'''<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
 <TR><TD BGCOLOR="lightgrey"><B>Device Descriptor</B></TD></TR>
 <TR><TD>bLength:  {bLength}</TD></TR>
-<TR><TD>bDescriptorType:  {bDescriptorType}</TD></TR>
+<TR><TD>bDescriptorType:  {hex(bDescriptorType)}</TD></TR>
 <TR><TD>bcdUSB:  {bcdUSB}</TD></TR>
 <TR><TD>bDeviceClass:  {bDeviceClass}</TD></TR>
 <TR><TD>bDeviceSubClass:  {bDeviceSubClass}</TD></TR>
@@ -58,7 +58,7 @@ def CreateConfigurationDescriptorNode(descriptor: list):
     return f'''<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
 <TR><TD BGCOLOR="lightgrey"><B>Configuration Descriptor</B></TD></TR>
 <TR><TD>bLength:  {bLength}</TD></TR>
-<TR><TD>bDescriptorType:  {bDescriptorType}</TD></TR>
+<TR><TD>bDescriptorType:  {hex(bDescriptorType)}</TD></TR>
 <TR><TD>wTotalLength:  {wTotalLength}</TD></TR>
 <TR><TD>bNumInterfaces:  {bNumInterfaces}</TD></TR>
 <TR><TD>bConfigurationValue:  {bConfigurationValue}</TD></TR>
@@ -75,7 +75,7 @@ def CreateStringDescriptorNode(descriptor: list):
     return f'''<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
 <TR><TD BGCOLOR="lightgrey"><B>String Descriptor</B></TD></TR>
 <TR><TD>bLength:  {bLength}</TD></TR>
-<TR><TD>bDescriptorType:  {bDescriptorType}</TD></TR>
+<TR><TD>bDescriptorType:  {hex(bDescriptorType)}</TD></TR>
 <TR><TD>String:  {string_data}</TD></TR>
 </TABLE>>'''
 
@@ -101,7 +101,7 @@ def CreateInterfaceDescriptorNode(descriptor: list):
     return f'''<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
 <TR><TD BGCOLOR="lightgrey"><B>Interface Descriptor</B></TD></TR>
 <TR><TD>bLength: {bLength}</TD></TR>
-<TR><TD>bDescriptorType: {bDescriptorType}</TD></TR>
+<TR><TD>bDescriptorType: {hex(bDescriptorType)}</TD></TR>
 <TR><TD>bInterfaceNumber: {bInterfaceNumber}</TD></TR>
 <TR><TD>bAlternateSetting: {bAlternateSetting}</TD></TR>
 <TR><TD>bNumEndpoints: {bNumEndpoints}</TD></TR>
@@ -141,7 +141,7 @@ def CreateEndpointDescriptorNode(descriptor: list):
             2: "Adaptive",
             3: "Synchronous"
         }.get(sync_type, "Unknown")
-        usage_type = (bmAttributes >> 4) & 0x03
+        usage_type = (bmAttributes >>4) & 0x03
         usage_type_str = {
             0: "Data endpoint",
             1: "Feedback endpoint",
@@ -155,7 +155,7 @@ def CreateEndpointDescriptorNode(descriptor: list):
     return f'''<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
 <TR><TD BGCOLOR="lightgrey"><B>Endpoint Descriptor</B></TD></TR>
 <TR><TD>bLength: {bLength}</TD></TR>
-<TR><TD>bDescriptorType: {bDescriptorType}</TD></TR>
+<TR><TD>bDescriptorType: {hex(bDescriptorType)}</TD></TR>
 <TR><TD>bEndpointAddress: {hex(bEndpointAddress)} ({direction} Endpoint {endpoint_number})</TD></TR>
 <TR><TD>bmAttributes: {hex(bmAttributes)} ({attributes_str})</TD></TR>
 <TR><TD>wMaxPacketSize: {wMaxPacketSize}</TD></TR>
@@ -175,7 +175,7 @@ def CreateInterfaceAssociationDescriptorNode(descriptor: list):
     return f'''<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
 <TR><TD BGCOLOR="lightgrey"><B>Interface Association Descriptor</B></TD></TR>
 <TR><TD>bLength:  {bLength}</TD></TR>
-<TR><TD>bDescriptorType:  {bDescriptorType}</TD></TR>
+<TR><TD>bDescriptorType:  {hex(bDescriptorType)}</TD></TR>
 <TR><TD>bFirstInterface:  {bFirstInterface}</TD></TR>
 <TR><TD>bInterfaceCount:  {bInterfaceCount}</TD></TR>
 <TR><TD>bFunctionClass:  {bFunctionClass}</TD></TR>
@@ -198,7 +198,7 @@ def CreateDeviceQualifierDescriptorNode(descriptor: list):
     return f'''<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
 <TR><TD BGCOLOR="lightgrey"><B>Device Qualifier Descriptor</B></TD></TR>
 <TR><TD>bLength: {bLength}</TD></TR>
-<TR><TD>bDescriptorType: {bDescriptorType}</TD></TR>
+<TR><TD>bDescriptorType: {hex(bDescriptorType)}</TD></TR>
 <TR><TD>bcdUSB: {bcdUSB}</TD></TR>
 <TR><TD>bDeviceClass: {bDeviceClass}</TD></TR>
 <TR><TD>bDeviceSubClass: {bDeviceSubClass}</TD></TR>
@@ -221,7 +221,7 @@ def CreateOtherSpeedConfigurationDescriptorNode(descriptor: list):
     return f'''<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
 <TR><TD BGCOLOR="lightgrey"><B>Other Speed Configuration Descriptor</B></TD></TR>
 <TR><TD>bLength: {bLength}</TD></TR>
-<TR><TD>bDescriptorType: {bDescriptorType}</TD></TR>
+<TR><TD>bDescriptorType: {hex(bDescriptorType)}</TD></TR>
 <TR><TD>wTotalLength: {wTotalLength}</TD></TR>
 <TR><TD>bNumInterfaces: {bNumInterfaces}</TD></TR>
 <TR><TD>bConfigurationValue: {bConfigurationValue}</TD></TR>
@@ -236,28 +236,72 @@ def CreateDeviceCapabilityDescriptorNode(descriptor: list):
     bDescriptorType = descriptor[1]
     bDevCapabilityType = descriptor[2]
     capability_name = get_bos_device_capability(bDevCapabilityType)
-    data_bytes = [hex(byte) for byte in descriptor[3:bLength]]
+    data = descriptor[3:bLength]
+
+    if bDevCapabilityType == 2:  # USB 2.0 Extension
+        bmAttributes = data[0] | (data[1] << 8) | (data[2] << 16) | (data[3] << 24)
+        lpm_capable = "LPM Capable" if bmAttributes & 0x02 else "Not LPM Capable"
+        data_str = f"<TR><TD>bmAttributes: 0x{bmAttributes:08x} ({lpm_capable})</TD></TR>"
+    elif bDevCapabilityType == 3:  # SuperSpeed USB
+        bmAttributes = data[0]
+        wSpeedsSupported = data[1] | (data[2] << 8)
+        bFunctionalitySupport = data[3]
+        bU1DevExitLat = data[4]
+        wU2DevExitLat = data[5] | (data[6] << 8)
+        speeds = []
+        if wSpeedsSupported & 0x01:
+            speeds.append("Low-speed")
+        if wSpeedsSupported & 0x02:
+            speeds.append("Full-speed")
+        if wSpeedsSupported & 0x04:
+            speeds.append("High-speed")
+        if wSpeedsSupported & 0x08:
+            speeds.append("SuperSpeed")
+        speeds_str = ", ".join(speeds) or "None"
+        data_str = f"<TR><TD>bmAttributes: 0x{bmAttributes:02x}</TD></TR>"
+        data_str += f"<TR><TD>wSpeedsSupported: 0x{wSpeedsSupported:04x} ({speeds_str})</TD></TR>"
+        data_str += f"<TR><TD>bFunctionalitySupport: {bFunctionalitySupport}</TD></TR>"
+        data_str += f"<TR><TD>bU1DevExitLat: {bU1DevExitLat} μs</TD></TR>"
+        data_str += f"<TR><TD>wU2DevExitLat: {wU2DevExitLat} μs</TD></TR>"
+    elif bDevCapabilityType == 5:  # Container ID
+        container_id = ''.join(f'{b:02x}' for b in descriptor[4:20]) if bLength >= 20 else "Invalid Length"
+        data_str = f"<TR><TD>Container ID: {container_id}</TD></TR>"
+    else:
+        data_bytes = [hex(byte) for byte in data]
+        data_str = f"<TR><TD>Capability Data: {data_bytes}</TD></TR>"
+
     return f'''<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
-<TR><TD BGCOLOR="lightgrey"><B>Device Capability Descriptor</B></TD></TR>
+<TR><TD BGCOLOR="lightgrey"><B>Device Capability Descriptor ({capability_name})</B></TD></TR>
 <TR><TD>bLength:  {bLength}</TD></TR>
-<TR><TD>bDescriptorType:  {bDescriptorType}</TD></TR>
-<TR><TD>bDevCapabilityType:  {bDevCapabilityType} ({capability_name})</TD></TR>
-<TR><TD>Capability Data:  {data_bytes}</TD></TR>
+<TR><TD>bDescriptorType:  {hex(bDescriptorType)}</TD></TR>
+<TR><TD>bDevCapabilityType:  {bDevCapabilityType}</TD></TR>
+{data_str}
 </TABLE>>'''
 
-def CreateSSEndpointCompanionDescriptorNode(descriptor: list):
-    '''**SuperSpeed Endpoint Companion**: Additional descriptor for SuperSpeed endpoints.'''
+def CreateSSEndpointCompanionDescriptorNode(descriptor: list, transfer_type: int):
+    '''**SuperSpeed Endpoint Companion**: Additional descriptor for SuperSpeed endpoints, decoded based on parent endpoint type.'''
     bLength = descriptor[0]
     bDescriptorType = descriptor[1]
     bMaxBurst = descriptor[2]
     bmAttributes = descriptor[3]
     wBytesPerInterval = (descriptor[5] << 8) + descriptor[4]  # Little-endian
+
+    if transfer_type == 2:  # Bulk
+        max_streams = bmAttributes & 0x1F
+        attributes_str = f"MaxStreams: {max_streams}"
+    elif transfer_type == 1:  # Isochronous
+        mult = bmAttributes & 0x03
+        ssp = "SS+" if bmAttributes & 0x80 else "No SS+"
+        attributes_str = f"Mult: {mult}, {ssp}"
+    else:
+        attributes_str = f"0x{bmAttributes:02x} (Undecoded for type {transfer_type})"
+
     return f'''<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
 <TR><TD BGCOLOR="lightgrey"><B>SuperSpeed Endpoint Companion Descriptor</B></TD></TR>
 <TR><TD>bLength:  {bLength}</TD></TR>
-<TR><TD>bDescriptorType:  {bDescriptorType}</TD></TR>
+<TR><TD>bDescriptorType:  {hex(bDescriptorType)}</TD></TR>
 <TR><TD>bMaxBurst:  {bMaxBurst}</TD></TR>
-<TR><TD>bmAttributes:  {bmAttributes}</TD></TR>
+<TR><TD>bmAttributes:  {attributes_str}</TD></TR>
 <TR><TD>wBytesPerInterval:  {wBytesPerInterval}</TD></TR>
 </TABLE>>'''
 
@@ -270,7 +314,7 @@ def CreateSSPIsochEndpointCompanionDescriptorNode(descriptor: list):
     return f'''<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
 <TR><TD BGCOLOR="lightgrey"><B>SuperSpeedPlus Isochronous Endpoint Companion Descriptor</B></TD></TR>
 <TR><TD>bLength:  {bLength}</TD></TR>
-<TR><TD>bDescriptorType:  {bDescriptorType}</TD></TR>
+<TR><TD>bDescriptorType:  {hex(bDescriptorType)}</TD></TR>
 <TR><TD>wReserved:  {wReserved}</TD></TR>
 <TR><TD>dwBytesPerInterval:  {dwBytesPerInterval}</TD></TR>
 </TABLE>>'''
@@ -284,7 +328,7 @@ def CreateBOSDescriptorNode(descriptor: list):
     return f'''<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
 <TR><TD BGCOLOR="lightgrey"><B>BOS Descriptor</B></TD></TR>
 <TR><TD>bLength:  {bLength}</TD></TR>
-<TR><TD>bDescriptorType:  {bDescriptorType}</TD></TR>
+<TR><TD>bDescriptorType:  {hex(bDescriptorType)}</TD></TR>
 <TR><TD>wTotalLength:  {wTotalLength}</TD></TR>
 <TR><TD>bNumDeviceCaps:  {bNumDeviceCaps}</TD></TR>
 </TABLE>>'''
@@ -309,7 +353,7 @@ def CreateHIDDescriptorNode(descriptor: list) -> str:
     table_str = f'''<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
 <TR><TD BGCOLOR="lightgrey"><B>HID Descriptor</B></TD></TR>
 <TR><TD>bLength: {bLength}</TD></TR>
-<TR><TD>bDescriptorType: {bDescriptorType} (HID)</TD></TR>
+<TR><TD>bDescriptorType: {hex(bDescriptorType)} (HID)</TD></TR>
 <TR><TD>bcdHID: {bcdHID}</TD></TR>
 <TR><TD>bCountryCode: {bCountryCode} (${decode_country_code(bCountryCode)})</TD></TR>
 <TR><TD>bNumDescriptors: {bNumDescriptors}</TD></TR>'''
@@ -405,7 +449,7 @@ def CreatePhysicalDescriptorNode(descriptor: list) -> str:
     return f'''<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
 <TR><TD BGCOLOR="lightgrey"><B>Physical Descriptor</B></TD></TR>
 <TR><TD>bLength: {bLength}</TD></TR>
-<TR><TD>bDescriptorType: {bDescriptorType} (Physical)</TD></TR>
+<TR><TD>bDescriptorType: {hex(bDescriptorType)} (Physical)</TD></TR>
 <TR><TD>Data: {bData}</TD></TR>
 </TABLE>>'''
 
@@ -424,7 +468,7 @@ def CreateAudioInterfaceDescriptorNode(descriptor: list, interface_subclass: int
             return f'''<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
 <TR><TD BGCOLOR="lightgrey"><B>AudioControl Header Descriptor</B></TD></TR>
 <TR><TD>bLength: {bLength}</TD></TR>
-<TR><TD>bDescriptorType: {bDescriptorType}</TD></TR>
+<TR><TD>bDescriptorType: {hex(bDescriptorType)}</TD></TR>
 <TR><TD>bDescriptorSubtype: {bDescriptorSubtype} (HEADER)</TD></TR>
 <TR><TD>bcdADC: {bcdADC}</TD></TR>
 <TR><TD>wTotalLength: {wTotalLength}</TD></TR>
@@ -443,7 +487,7 @@ def CreateAudioInterfaceDescriptorNode(descriptor: list, interface_subclass: int
             return f'''<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
 <TR><TD BGCOLOR="lightgrey"><B>Input Terminal Descriptor</B></TD></TR>
 <TR><TD>bLength: {bLength}</TD></TR>
-<TR><TD>bDescriptorType: {bDescriptorType}</TD></TR>
+<TR><TD>bDescriptorType: {hex(bDescriptorType)}</TD></TR>
 <TR><TD>bDescriptorSubtype: {bDescriptorSubtype} (INPUT_TERMINAL)</TD></TR>
 <TR><TD>bTerminalID: {bTerminalID}</TD></TR>
 <TR><TD>wTerminalType: {wTerminalType} ({terminal_type_name})</TD></TR>
@@ -463,7 +507,7 @@ def CreateAudioInterfaceDescriptorNode(descriptor: list, interface_subclass: int
             return f'''<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
 <TR><TD BGCOLOR="lightgrey"><B>Output Terminal Descriptor</B></TD></TR>
 <TR><TD>bLength: {bLength}</TD></TR>
-<TR><TD>bDescriptorType: {bDescriptorType}</TD></TR>
+<TR><TD>bDescriptorType: {hex(bDescriptorType)}</TD></TR>
 <TR><TD>bDescriptorSubtype: {bDescriptorSubtype} (OUTPUT_TERMINAL)</TD></TR>
 <TR><TD>bTerminalID: {bTerminalID}</TD></TR>
 <TR><TD>wTerminalType: {wTerminalType} ({terminal_type_name})</TD></TR>
@@ -489,7 +533,7 @@ def CreateAudioInterfaceDescriptorNode(descriptor: list, interface_subclass: int
             return f'''<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
 <TR><TD BGCOLOR="lightgrey"><B>Feature Unit Descriptor</B></TD></TR>
 <TR><TD>bLength: {bLength}</TD></TR>
-<TR><TD>bDescriptorType: {bDescriptorType}</TD></TR>
+<TR><TD>bDescriptorType: {hex(bDescriptorType)}</TD></TR>
 <TR><TD>bDescriptorSubtype: {bDescriptorSubtype} (FEATURE_UNIT)</TD></TR>
 <TR><TD>bUnitID: {bUnitID}</TD></TR>
 <TR><TD>bSourceID: {bSourceID}</TD></TR>
@@ -507,7 +551,7 @@ def CreateAudioInterfaceDescriptorNode(descriptor: list, interface_subclass: int
             return f'''<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
 <TR><TD BGCOLOR="lightgrey"><B>AudioStreaming General Descriptor</B></TD></TR>
 <TR><TD>bLength: {bLength}</TD></TR>
-<TR><TD>bDescriptorType: {bDescriptorType}</TD></TR>
+<TR><TD>bDescriptorType: {hex(bDescriptorType)}</TD></TR>
 <TR><TD>bDescriptorSubtype: {bDescriptorSubtype} (AS_GENERAL)</TD></TR>
 <TR><TD>bTerminalLink: {bTerminalLink}</TD></TR>
 <TR><TD>bDelay: {bDelay}</TD></TR>
@@ -530,13 +574,13 @@ def CreateAudioInterfaceDescriptorNode(descriptor: list, interface_subclass: int
                 return f'''<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
 <TR><TD BGCOLOR="lightgrey"><B>Format Type I Descriptor</B></TD></TR>
 <TR><TD>bLength: {bLength}</TD></TR>
-<TR><TD>bDescriptorType: {bDescriptorType}</TD></TR>
+<TR><TD>bDescriptorType: {hex(bDescriptorType)}</TD></TR>
 <TR><TD>bDescriptorSubtype: {bDescriptorSubtype} (FORMAT_TYPE)</TD></TR>
 <TR><TD>bFormatType: {bFormatType} (TYPE_I)</TD></TR>
 <TR><TD>bNrChannels: {bNrChannels}</TD></TR>
 <TR><TD>bSubframeSize: {bSubframeSize}</TD></TR>
 <TR><TD>bBitResolution: {bBitResolution}</TD></TR>
-<TR><TD>bSamFreqType: {bSamFreqType}</TD></TR>
+<TR><TD>bSamFreqType: {bSamFreqType}</платформTD></TR>
 <TR><TD>Sampling Frequencies: {sam_freq_str}</TD></TR>
 </TABLE>>'''
             else:
@@ -569,7 +613,7 @@ def CreateAudioEndpointDescriptorNode(descriptor: list) -> str:
     return f'''<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
 <TR><TD BGCOLOR="lightgrey"><B>Audio Streaming Endpoint Descriptor</B></TD></TR>
 <TR><TD>bLength: {bLength}</TD></TR>
-<TR><TD>bDescriptorType: {bDescriptorType}</TD></TR>
+<TR><TD>bDescriptorType: {hex(bDescriptorType)}</TD></TR>
 <TR><TD>bDescriptorSubtype: {bDescriptorSubtype} (EP_GENERAL)</TD></TR>
 <TR><TD>bmAttributes: {hex(bmAttributes)} (Sampling Frequency Control: {sampling_freq_control}, Pitch Control: {pitch_control})</TD></TR>
 <TR><TD>bLockDelayUnits: {bLockDelayUnits} ({lock_delay_units_str})</TD></TR>
@@ -613,8 +657,11 @@ def ProcessAndGenerateFlow(descriptors: list) -> Digraph:
             device_node = node_id
             root_node = node_id  # Temporarily set as root, may update later
 
-        elif bDescriptorType == 2:  # Configuration Descriptor
-            table_str = CreateConfigurationDescriptorNode(descriptor)
+        elif bDescriptorType == 2 or bDescriptorType == 7:  # Configuration or Other Speed Configuration Descriptor
+            if bDescriptorType == 2:
+                table_str = CreateConfigurationDescriptorNode(descriptor)
+            else:  # bDescriptorType == 7
+                table_str = CreateOtherSpeedConfigurationDescriptorNode(descriptor)
             dot.node(node_id, table_str, shape='none')
             if device_node:
                 dot.edge(device_node, node_id)
@@ -639,8 +686,8 @@ def ProcessAndGenerateFlow(descriptors: list) -> Digraph:
             current_interface_subclass = descriptor[6]
             table_str = CreateInterfaceDescriptorNode(descriptor)
             dot.node(node_id, table_str, shape='none')
-            if root_node:
-                dot.edge(root_node, node_id)
+            if current_config:
+                dot.edge(current_config, node_id)
             current_interface = node_id
 
         elif bDescriptorType == 5:  # Endpoint Descriptor
@@ -649,15 +696,28 @@ def ProcessAndGenerateFlow(descriptors: list) -> Digraph:
             if current_interface:
                 dot.edge(current_interface, node_id)
             current_endpoint = node_id
-
-        elif bDescriptorType in [48, 49]:  # Superspeed companions
-            if bDescriptorType == 48:
-                table_str = CreateSSEndpointCompanionDescriptorNode(descriptor)
-            elif bDescriptorType == 49:
-                table_str = CreateSSPIsochEndpointCompanionDescriptorNode(descriptor)
-            dot.node(node_id, table_str, shape='none')
-            if current_endpoint:
-                dot.edge(current_endpoint, node_id)
+            # Process companion descriptors
+            companion_index = index + bLength
+            while companion_index < len(descriptors):
+                companion_bLength = descriptors[companion_index]
+                if companion_index + 1 >= len(descriptors) or companion_index + companion_bLength > len(descriptors):
+                    break
+                companion_bDescriptorType = descriptors[companion_index + 1]
+                if companion_bDescriptorType not in [48, 49]:
+                    break
+                companion_descriptor = descriptors[companion_index:companion_index + companion_bLength]
+                companion_node_id = f"desc_{node_counter}"
+                node_counter += 1
+                if companion_bDescriptorType == 48:
+                    bmAttributes = descriptor[3]  # From endpoint
+                    transfer_type = bmAttributes & 0x03
+                    table_str = CreateSSEndpointCompanionDescriptorNode(companion_descriptor, transfer_type)
+                elif companion_bDescriptorType == 49:
+                    table_str = CreateSSPIsochEndpointCompanionDescriptorNode(companion_descriptor)
+                dot.node(companion_node_id, table_str, shape='none')
+                dot.edge(current_endpoint, companion_node_id)
+                companion_index += companion_bLength
+            index = companion_index  # Skip processed companions
 
         elif bDescriptorType == 3:  # String Descriptor
             table_str = CreateStringDescriptorNode(descriptor)
@@ -678,11 +738,9 @@ def ProcessAndGenerateFlow(descriptors: list) -> Digraph:
             dot.node(node_id, table_str, shape='none')
             class_specific_nodes.append(node_id)
 
-        elif bDescriptorType in [6, 7, 11]:  # Other standard (excluding BOS and Device Capability)
+        elif bDescriptorType in [6, 11]:  # Other standard (excluding Configuration, Other Speed Config, BOS, Device Capability)
             if bDescriptorType == 6:
                 table_str = CreateDeviceQualifierDescriptorNode(descriptor)
-            elif bDescriptorType == 7:
-                table_str = CreateOtherSpeedConfigurationDescriptorNode(descriptor)
             elif bDescriptorType == 11:
                 table_str = CreateInterfaceAssociationDescriptorNode(descriptor)
             dot.node(node_id, table_str, shape='none')
@@ -694,7 +752,8 @@ def ProcessAndGenerateFlow(descriptors: list) -> Digraph:
             dot.node(node_id, table_str, shape='none')
             unknown_nodes.append(node_id)
 
-        index += bLength
+        if bDescriptorType != 5:  # Increment index only if not already adjusted by companion processing
+            index += bLength
 
     # Chain string descriptors and position on the right
     if string_nodes:
