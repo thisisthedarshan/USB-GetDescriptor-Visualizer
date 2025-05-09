@@ -3,13 +3,15 @@
 # This work is licensed under the terms of the MIT license.  
 # For a copy, see <https://opensource.org/licenses/MIT>.
 
+import tempfile
+import os
 from graphviz import Digraph
 from processing import LoadHexArray, ProcessAndGenerateFlow
 import argparse
 
 def main():
     parser = argparse.ArgumentParser(description="Visualize USB descriptors")
-    parser.add_argument('--save', action='store_true', help="Save output as usb_descriptors.png")
+    parser.add_argument('--save', type=str, nargs='?', default=None, help="Save output (defaults as usb_descriptors.png)")
     parser.add_argument('--render', action='store_true', help="Render and display output")
     args = parser.parse_args()
     
@@ -35,8 +37,12 @@ def main():
         dot.render('usb_descriptors', format='png', cleanup=True)
         print("Saved as usb_descriptors.png")
       elif choice == "2":
-          dot.render('usb_descriptors', format='png', view=True, cleanup=True)
+          with tempfile.NamedTemporaryFile(delete=False) as tmpfile:
+            tmp_filename = tmpfile.name
+          dot.render(tmp_filename, format='png', view=True, cleanup=True)
           print("Rendered and displayed")
+          if os.path.exists(tmp_filename+".png"):
+              os.remove(tmp_filename+".png")
       elif choice == "3":
           dot.render('usb_descriptors', format='png', view=True, cleanup=True)
           print("Saved as usb_descriptors.png and displayed")
@@ -44,15 +50,21 @@ def main():
           print("Invalid choice, no action taken")
         
     # Perform actions based on arguments
-    if args.save and args.render:
-        dot.render('usb_descriptors', format='png', view=True, cleanup=True)
-        print("Saved as usb_descriptors.png and displayed")
-    elif args.save:
-        dot.render('usb_descriptors', format='png', cleanup=True)
-        print("Saved as usb_descriptors.png")
+    if args.save is not None and args.render:
+        filename = args.save if args.save != "" else "usb_descriptors"
+        dot.render(filename, format='png', view=True, cleanup=True)
+        print(f"Saved as {filename}.png and displayed")
+    elif args.save is not None:
+        filename = args.save if args.save != "" else "usb_descriptors"
+        dot.render(filename, format='png', cleanup=True)
+        print(f"Saved as {filename}.png")
     elif args.render:
-        dot.render('usb_descriptors', format='png', view=True, cleanup=True)
+        with tempfile.NamedTemporaryFile(delete=False) as tmpfile:
+          tmp_filename = tmpfile.name
+        dot.render(tmp_filename, format='png', view=True, cleanup=True)
         print("Rendered and displayed")
+        if os.path.exists(tmp_filename+".png"):
+            os.remove(tmp_filename+".png")
         
 
 if __name__ == "__main__":
