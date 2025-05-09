@@ -35,4 +35,4 @@ Simple way to check what your system's device descriptors are:
 3. Simply run `cat usb_descriptors_dump.txt | python3 main.py --render` to see the output
 
 > [!NOTE]
-> Check out the info [USB-GET_DESCRIPTORS](GET_DESCRIPTOR.md) to learn more
+> Check out the info [USB-GET_DESCRIPTORS](GET_DESCRIPTOR.md) to learn more about what is `USB_GET_DESCRIPTOR` command.
