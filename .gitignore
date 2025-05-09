@@ -178,7 +178,8 @@ cython_debug/
 *.swp
 *.tmp
 
-# Generated files
-usb_descriptors
-usb_descriptors.png
-usb_descriptors_dump.txt
+# Ignore all generated PNG and TXT files
+usb_descriptor*
+descriptor*
+*.png
+*.txt
