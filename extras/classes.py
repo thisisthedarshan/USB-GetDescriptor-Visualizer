@@ -346,12 +346,7 @@ More = {
     0xb0 : "Feature",
     0xb4 : "Pop",
     0xc0 : "End Collection"
-  },
-  "hid" : {
-    0x21 :  "HID",
-    0x22 :  "Report",
-    0x23 :  "Physical"
-  },
+  }
 }
 
 DeviceCapabilityTypeCode = {
