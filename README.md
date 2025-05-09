@@ -17,7 +17,11 @@ Once the program starts, it asks you to enter the result of **GET_DESCRIPTOR** U
 > [!NOTE]
 > The program assumes the byte order to be in Little Endian format.
 
-You can also pass `--render`, `--save` so as to skip the menu option asking you whether you want to save file or render it.
+### Flags
+
+- `--save [filename]`: Save the output to the specified file (e.g., `--save output` will save as output.png). If no filename is provided, it will default to `usb_descriptors.png`.
+- `--render`: Render and display the output (opens the rendered file for viewing).
+
 
 ## Supported Descriptors
 
