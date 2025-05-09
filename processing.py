@@ -4,7 +4,7 @@
 # For a copy, see <https://opensource.org/licenses/MIT>.
 
 from graphviz import Digraph
-from extras.classes import Classes, More
+from extras.classes import Classes, More, DeviceCapabilityTypeCode
 from helpers import bcd_to_string, decode_country_code, get_vendor_name, get_product_name, get_bos_device_capability
 
 # Internal Functions
@@ -274,7 +274,7 @@ def CreateDeviceCapabilityDescriptorNode(descriptor: list):
 <TR><TD BGCOLOR="lightgrey"><B>Device Capability Descriptor ({capability_name})</B></TD></TR>
 <TR><TD>bLength:  {bLength}</TD></TR>
 <TR><TD>bDescriptorType:  {hex(bDescriptorType)}</TD></TR>
-<TR><TD>bDevCapabilityType:  {bDevCapabilityType}</TD></TR>
+<TR><TD>bDevCapabilityType:  {bDevCapabilityType} ({DeviceCapabilityTypeCode.get(bDescriptorType,"Unknown")})</TD></TR>
 {data_str}
 </TABLE>>'''
 
