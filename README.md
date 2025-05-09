@@ -21,8 +21,9 @@ You can also pass `--render`, `--save` so as to skip the menu option asking you 
 
 ## Supported Descriptors
 
-1. Standard USB Descriptors
-2. Audio Class USB Descriptors
+1. Standard USB Descriptors.
+2. Audio Class USB Descriptors.
+3. HID Class USB Descriptors.
 
 ---
 
