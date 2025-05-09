@@ -66,9 +66,9 @@ def viewTemp(dot:Digraph):
         print(f"Rendered and displayed as {tmp_filename}.png")
     # Spawn a process to delete the file after 5 minutes (300 seconds)
     if os.name == 'nt':  # Windows
-        subprocess.Popen(f'ping 127.0.0.1 -n 300 && del "{tmp_filename}"', shell=True)
+        subprocess.Popen(f'ping 127.0.0.1 -n 300 && del "{tmp_filename}.png"', shell=True)
     else:  # Unix-like (Linux, macOS)
-        subprocess.Popen(f'sleep 300 && rm "{tmp_filename}"', shell=True)
+        subprocess.Popen(f'sleep 300 && rm "{tmp_filename}.png"', shell=True)
 
 if __name__ == "__main__":
     main()
