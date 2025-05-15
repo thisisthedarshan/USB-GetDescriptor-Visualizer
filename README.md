@@ -1,4 +1,4 @@
-# usb-getdescriptor-visualizer
+# USB GetDescriptor Visualizer
 
 This project uses given sequence of bytes (assuming little endian format) and shows a visualization of the descriptors. The input given is the result of a USB *GET_DESCRIPTOR* command
 
@@ -40,3 +40,8 @@ Simple way to check what your system's device descriptors are:
 
 > [!NOTE]
 > Check out the info [USB-GET_DESCRIPTORS](GET_DESCRIPTOR.md) to learn more about what is `USB_GET_DESCRIPTOR` command.
+
+
+### Watermark
+
+Font used is [Anta](https://fonts.google.com/specimen/Anta), Designed by Sergej Lebedev, released under [SIL Open Font License, Version 1.1 .](https://openfontlicense.org/open-font-license-official-text/)

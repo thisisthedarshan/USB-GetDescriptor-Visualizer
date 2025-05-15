@@ -6,6 +6,7 @@
 from graphviz import Digraph
 from extras.classes import Classes, More, DeviceCapabilityTypeCode
 from helpers import bcd_to_string, decode_country_code, get_vendor_name, get_product_name, get_bos_device_capability
+from PIL import Image, ImageDraw, ImageFont
 
 # Internal Functions
 def CreateDeviceDescriptorNode(descriptor: list):
@@ -789,3 +790,88 @@ def ProcessAndGenerateFlow(descriptors: list) -> Digraph:
                 s.node(string_nodes[0])
 
     return dot
+
+def addWatermark(image_path):
+    """
+    Adds a watermark to a PNG image by extending it from the bottom and adding text.
+    
+    Args:
+        image_path (str): Path to the PNG image file.
+    """
+    # Open the original image
+    img = Image.open(image_path)
+    original_height = img.height
+    original_width = img.width
+    mode = img.mode
+    
+    # Set padding and font size
+    padding = 20  # pixels
+    dynamic_size = original_height/36
+    font_size = max(dynamic_size, 21)
+    
+    try:
+        font = ImageFont.truetype("Anta-Regular.ttf", font_size)
+    except IOError:
+        print("Font not found, using default font")
+        font = ImageFont.load_default()
+    
+    # Define texts
+    left_text = "With Love from :D"
+    right_text = "https://github.com/thisisthedarshan/USB-GetDescriptor-Visualizer"
+    center_text = "Made with USB-GetDescriptor-Visualizer"
+    
+    # Create a temporary draw object to measure text
+    temp_img = Image.new('RGB', (1, 1))
+    draw = ImageDraw.Draw(temp_img)
+    
+    # Get text sizes
+    left_bbox = draw.textbbox((0, 0), left_text, font=font)
+    center_bbox = draw.textbbox((0, 0), center_text, font=font)
+    right_bbox = draw.textbbox((0, 0), right_text, font=font)
+    
+    left_width = left_bbox[2] - left_bbox[0]
+    left_height = left_bbox[3] - left_bbox[1]
+    center_width = center_bbox[2] - center_bbox[0]
+    center_height = center_bbox[3] - center_bbox[1]
+    right_width = right_bbox[2] - right_bbox[0]
+    right_height = right_bbox[3] - right_bbox[1]
+    
+    max_text_height = max(left_height, center_height, right_height)
+    
+    # Set extension height based on text size
+    extension_height = max_text_height + 2 * padding
+    
+    # Create new image with extended height
+    new_height = original_height + extension_height
+    if mode == 'RGBA':
+        new_img = Image.new('RGBA', (img.width, new_height), (255, 255, 255, 255))
+    else:
+        new_img = Image.new('RGB', (img.width, new_height), (255, 255, 255))
+    new_img.paste(img, (0, 0))
+    
+    # Create draw object for new image
+    draw = ImageDraw.Draw(new_img)
+    
+    # Set text color based on image mode
+    if mode == 'RGBA':
+        text_color = (0, 0, 0, 128)  # Semi-transparent black
+    else:
+        text_color = (0, 0, 0)  # Solid black
+    
+    # Calculate y position for all texts
+    y_position = original_height + padding
+    
+    # Draw left text
+    left_x = padding
+    draw.text((left_x, y_position), left_text, font=font, fill=text_color)
+    
+    # Draw center text
+    center_x = (img.width - center_width) / 2
+    draw.text((center_x, y_position), center_text, font=font, fill=text_color)
+    
+    # Draw right text
+    right_x = img.width - right_width - padding
+    draw.text((right_x, y_position), right_text, font=font, fill=text_color)
+    
+    # Save over original file
+    new_img.save(image_path)
