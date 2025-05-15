@@ -55,11 +55,14 @@ def USBGetDescriptorVisualizer():
                                      The source code of this project is available on <https://github.com/thisisthedarshan/USB-GetDescriptor-Visualizer/>""")
     parser.add_argument('--save', type=str, nargs='?', default=None, help="Save output (defaults as usb_descriptors.png)")
     parser.add_argument('--render', action='store_true', help="Render and display output")
+    parser.add_argument("data", nargs="*", help="Data to be processed")
     args = parser.parse_args()
-    
-    # Get descriptors
-    input_data = input("Enter HEX Descriptor Bytes separated by spaces: ")
-    print("\n")
+    # Get descriptors from args
+    input_data = " ".join(args.data)
+    if len(input_data) <= 9:
+        # Get descriptors from command line
+        input_data = input("Enter HEX Descriptor Bytes separated by spaces: ")
+        print("\n")
     descriptors = LoadHexArray(input_data)
 
     dot = Digraph()  # Prepare an instance
