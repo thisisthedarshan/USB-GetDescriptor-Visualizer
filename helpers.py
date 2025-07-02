@@ -3,6 +3,7 @@
 # This work is licensed under the terms of the MIT license.  
 # For a copy, see <https://opensource.org/licenses/MIT>.
 
+from babel import Locale
 from extras.db import db
 from extras.classes import CountryCodes, DeviceCapabilityTypeCode
 
@@ -56,3 +57,11 @@ def decode_country_code(code):
         return name
     else:
         return f"Unknown (0x{code:02X})"
+    
+def get_language_name(tag:str):
+    """Convert a language tag to its English name."""
+    try:
+        locale = Locale.parse(tag.replace('-', '_').split(",")[0].strip())
+        return locale.english_name
+    except Exception:
+        return tag

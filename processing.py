@@ -4,8 +4,8 @@
 # For a copy, see <https://opensource.org/licenses/MIT>.
 
 from graphviz import Digraph
-from extras.classes import Classes, More, DeviceCapabilityTypeCode
-from helpers import bcd_to_string, decode_country_code, get_vendor_name, get_product_name, get_bos_device_capability
+from extras.classes import Classes, LANGIDs, More, DeviceCapabilityTypeCode
+from helpers import bcd_to_string, decode_country_code, get_language_name, get_vendor_name, get_product_name, get_bos_device_capability
 from PIL import Image, ImageDraw, ImageFont
 
 # Internal Functions
@@ -72,7 +72,7 @@ def CreateStringDescriptorNode(descriptor: list):
     '''**9.6.7 String**: Contains a Unicode string or language ID array (if index 0).'''
     bLength = descriptor[0]
     bDescriptorType = descriptor[1]
-    string_data = bytes(descriptor[2:bLength]).decode('utf-16-le')
+    string_data = bytes(descriptor[2:bLength]).decode('utf-16-le') if bLength > 0x04 else f"Supported Language: {get_language_name(LANGIDs.get((descriptor[3] << 8) | descriptor[2]))}"
     return f'''<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
 <TR><TD BGCOLOR="lightgrey"><B>String Descriptor</B></TD></TR>
 <TR><TD>bLength:  {bLength}</TD></TR>
